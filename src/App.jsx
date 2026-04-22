@@ -225,7 +225,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (!scrollRef.current) return;
+    if (messages.length <= 1 && !typing) {
+      scrollRef.current.scrollTop = 0;
+    } else {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, [messages, typing]);
 
   useEffect(() => {
