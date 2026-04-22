@@ -160,13 +160,13 @@ function MessageText({ content }) {
           ? <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="msg-link">{part}</a>
           : part
       )}
-      {bookingMatch && (
+      {(match || bookingMatch) && (
         <div style={{ marginTop: '12px' }}>
-          <a href={bookingMatch[0]} target="_blank" rel="noopener noreferrer" className="book-btn">
+          <a href={bookingMatch ? bookingMatch[0] : BOOKING_URL} target="_blank" rel="noopener noreferrer" className="book-btn">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
             </svg>
-            Book a Meeting
+            {match ? 'Book a Free Consultation' : 'Book a Meeting'}
           </a>
         </div>
       )}
@@ -437,16 +437,6 @@ export default function App() {
                 <div className="msg-row bot">
                   <div className="avatar bot"><img src={wmcLogo} alt="Wingman" style={{ width: '22px', height: '22px', objectFit: 'contain' }} /></div>
                   <div className="bubble bot"><div className="typing"><span /><span /><span /></div></div>
-                </div>
-              )}
-              {messages.some((m) => m.role === 'bot' && SCORE_REGEX.test(m.content)) && (
-                <div className="chat-cta-row">
-                  <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="book-btn">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
-                    </svg>
-                    Book a Free Consultation
-                  </a>
                 </div>
               )}
             </div>
