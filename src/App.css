@@ -55,6 +55,19 @@
   background: var(--accent);
   animation: pulse-ring 2s ease-out infinite;
 }
+.dev-reset {
+  margin-left: 8px;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-mute);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.dev-reset:hover { color: #fff; border-color: var(--accent); }
 
 /* ---------- Chat ---------- */
 .chat {

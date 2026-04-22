@@ -314,6 +314,11 @@ export default function App() {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
   };
 
+  const resetSession = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    window.location.reload();
+  };
+
   return (
     <div className="app">
       <StarCanvas />
@@ -322,7 +327,12 @@ export default function App() {
         <div className="brand">
           <img src={wmcLogo} alt="Wingman Creative" className="brand-logo" />
         </div>
-        <div className="status"><span className="dot" /> Online</div>
+        <div className="status">
+          <span className="dot" /> Online
+          <button type="button" onClick={resetSession} className="dev-reset" aria-label="Reset session">
+            Reset
+          </button>
+        </div>
       </header>
 
       {phase === 'loading' && (
