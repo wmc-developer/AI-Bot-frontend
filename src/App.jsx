@@ -374,7 +374,8 @@ export default function App() {
         <div className="phase-center">
           <form className="lead-form" onSubmit={submitForm} noValidate>
             <div className="lead-form-header">
-              <h2>Wingman Growth Advisor</h2>
+              <h2>Marketing Strength Calculator</h2>
+              <p>Please enter your details to begin chat</p>
             </div>
 
             <div className="field">
