@@ -439,6 +439,10 @@
   animation: fade-up 0.5s ease both;
 }
 
+.score-cta {
+  margin-top: 10px;
+}
+
 .score-ring-wrap {
   position: relative;
   width: 100px;

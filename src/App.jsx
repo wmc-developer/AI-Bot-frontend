@@ -137,6 +137,17 @@ function ScoreCard({ low, high }) {
       </div>
       <div className="score-label">Marketing Score</div>
       {high && <div className="score-range">{display} / 100 estimated</div>}
+      <a
+        href="https://meetings.hubspot.com/reddaway/wmc-nick-reddaway-discovery?uuid=1d75b9eb-fd39-4ae2-a206-03f9e3497f70"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="book-btn score-cta"
+      >
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Book a Free Consultation
+      </a>
     </div>
   );
 }
