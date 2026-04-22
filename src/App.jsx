@@ -233,6 +233,22 @@ export default function App() {
     }
   }, [messages, typing]);
 
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const apply = () => {
+      document.documentElement.style.setProperty('--app-h', `${vv.height}px`);
+      window.scrollTo(0, 0);
+    };
+    apply();
+    vv.addEventListener('resize', apply);
+    vv.addEventListener('scroll', apply);
+    return () => {
+      vv.removeEventListener('resize', apply);
+      vv.removeEventListener('scroll', apply);
+    };
+  }, []);
+
 
   useEffect(() => {
     const el = taRef.current;
