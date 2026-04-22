@@ -459,7 +459,6 @@ export default function App() {
                 <SendIcon />
               </button>
             </div>
-            <div className="hint">Press <strong>Enter</strong> to send · <strong>Shift+Enter</strong> for new line</div>
           </div>
         </>
       )}
