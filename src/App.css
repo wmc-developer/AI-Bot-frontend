@@ -488,7 +488,8 @@
 @media (max-width: 640px) {
   .header { padding: 14px 18px; }
   .brand-logo { height: 28px; }
-  .status { display: none; }
+  .status { gap: 6px; padding: 5px 8px; font-size: 10px; }
+  .status .dot { display: none; }
   .chat { padding: 20px 0 8px; }
   .chat-inner { padding: 0 16px; gap: 16px; }
   .hero { padding: 10px 0 6px; }
