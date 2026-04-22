@@ -429,6 +429,13 @@ export default function App() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
+                onFocus={() => {
+                  setTimeout(() => {
+                    if (scrollRef.current) {
+                      scrollRef.current.scrollTop = messages.length <= 1 ? 0 : scrollRef.current.scrollHeight;
+                    }
+                  }, 300);
+                }}
                 placeholder="Ask about your marketing score…"
               />
               <button className="send" onClick={() => send()} disabled={!input.trim() || typing} aria-label="Send">
