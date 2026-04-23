@@ -237,33 +237,40 @@ export default function App() {
   }, [messages, typing]);
 
   useEffect(() => {
-    const scrollBottom = () => {
+    const lockTop = () => {
       window.scrollTo(0, 0);
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     };
 
     const applyHeight = () => {
       const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
       document.documentElement.style.setProperty('--app-h', `${h}px`);
-      scrollBottom();
+      lockTop();
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     };
     applyHeight();
+
+    const onWinScroll = () => lockTop();
 
     const onFocusIn = (e) => {
       const tag = e.target.tagName;
       if (tag === 'TEXTAREA' || tag === 'INPUT') {
         document.documentElement.classList.add('kb-open');
-        [50, 200, 400, 700, 1000].forEach((d) => setTimeout(() => {
+        [0, 50, 150, 300, 500, 800, 1200].forEach((d) => setTimeout(() => {
+          lockTop();
           applyHeight();
-          e.target.scrollIntoView({ block: 'center', behavior: 'smooth' });
         }, d));
       }
     };
     const onFocusOut = () => {
       document.documentElement.classList.remove('kb-open');
-      setTimeout(applyHeight, 100);
+      [0, 100, 300, 600].forEach((d) => setTimeout(() => {
+        lockTop();
+        applyHeight();
+      }, d));
     };
 
     const vv = window.visualViewport;
@@ -272,6 +279,7 @@ export default function App() {
       vv.addEventListener('scroll', applyHeight);
     }
     window.addEventListener('resize', applyHeight);
+    window.addEventListener('scroll', onWinScroll, { passive: true });
     document.addEventListener('focusin', onFocusIn);
     document.addEventListener('focusout', onFocusOut);
 
@@ -281,6 +289,7 @@ export default function App() {
         vv.removeEventListener('scroll', applyHeight);
       }
       window.removeEventListener('resize', applyHeight);
+      window.removeEventListener('scroll', onWinScroll);
       document.removeEventListener('focusin', onFocusIn);
       document.removeEventListener('focusout', onFocusOut);
     };
