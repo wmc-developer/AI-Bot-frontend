@@ -237,21 +237,52 @@ export default function App() {
   }, [messages, typing]);
 
   useEffect(() => {
-    const vv = window.visualViewport;
-    if (!vv) return;
-    const apply = () => {
-      document.documentElement.style.setProperty('--app-h', `${vv.height}px`);
+    const scrollBottom = () => {
       window.scrollTo(0, 0);
       if (scrollRef.current) {
         scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
       }
     };
-    apply();
-    vv.addEventListener('resize', apply);
-    vv.addEventListener('scroll', apply);
+
+    const applyHeight = () => {
+      const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+      document.documentElement.style.setProperty('--app-h', `${h}px`);
+      scrollBottom();
+    };
+    applyHeight();
+
+    const onFocusIn = (e) => {
+      const tag = e.target.tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT') {
+        document.documentElement.classList.add('kb-open');
+        [50, 200, 400, 700, 1000].forEach((d) => setTimeout(() => {
+          applyHeight();
+          e.target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }, d));
+      }
+    };
+    const onFocusOut = () => {
+      document.documentElement.classList.remove('kb-open');
+      setTimeout(applyHeight, 100);
+    };
+
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', applyHeight);
+      vv.addEventListener('scroll', applyHeight);
+    }
+    window.addEventListener('resize', applyHeight);
+    document.addEventListener('focusin', onFocusIn);
+    document.addEventListener('focusout', onFocusOut);
+
     return () => {
-      vv.removeEventListener('resize', apply);
-      vv.removeEventListener('scroll', apply);
+      if (vv) {
+        vv.removeEventListener('resize', applyHeight);
+        vv.removeEventListener('scroll', applyHeight);
+      }
+      window.removeEventListener('resize', applyHeight);
+      document.removeEventListener('focusin', onFocusIn);
+      document.removeEventListener('focusout', onFocusOut);
     };
   }, []);
 
