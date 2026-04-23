@@ -454,7 +454,9 @@ export default function App() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 onFocus={() => {
-                  [100, 300, 500, 800].forEach((d) => setTimeout(() => {
+                  [0, 100, 250, 450, 700, 1000].forEach((d) => setTimeout(() => {
+                    window.scrollTo(0, 0);
+                    document.body.scrollTop = 0;
                     if (scrollRef.current) {
                       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                     }
