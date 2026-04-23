@@ -267,7 +267,7 @@
   border: none;
   outline: none;
   color: var(--text);
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   resize: none;
@@ -395,7 +395,7 @@
   border: 1px solid var(--border);
   border-radius: 2px;
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
   outline: none;
   transition: border-color 0.2s;
