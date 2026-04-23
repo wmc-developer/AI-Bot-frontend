@@ -242,6 +242,9 @@ export default function App() {
     const apply = () => {
       document.documentElement.style.setProperty('--app-h', `${vv.height}px`);
       window.scrollTo(0, 0);
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
     };
     apply();
     vv.addEventListener('resize', apply);
@@ -451,11 +454,11 @@ export default function App() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 onFocus={() => {
-                  setTimeout(() => {
+                  [100, 300, 500, 800].forEach((d) => setTimeout(() => {
                     if (scrollRef.current) {
-                      scrollRef.current.scrollTop = messages.length <= 1 ? 0 : scrollRef.current.scrollHeight;
+                      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
                     }
-                  }, 300);
+                  }, d));
                 }}
                 placeholder="Ask about your marketing score…"
               />
