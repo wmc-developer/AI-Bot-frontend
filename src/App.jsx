@@ -432,8 +432,16 @@ export default function App() {
                 id="lf-name"
                 type="text"
                 placeholder="Your name"
+                autoComplete="name"
+                enterKeyHint="next"
                 value={formData.name}
                 onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('lf-email')?.focus();
+                  }
+                }}
                 required
               />
             </div>
@@ -443,8 +451,17 @@ export default function App() {
                 id="lf-email"
                 type="email"
                 placeholder="you@example.com"
+                autoComplete="email"
+                inputMode="email"
+                enterKeyHint="next"
                 value={formData.email}
                 onChange={(e) => setFormData((d) => ({ ...d, email: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('lf-phone')?.focus();
+                  }
+                }}
                 required
               />
             </div>
@@ -454,8 +471,17 @@ export default function App() {
                 id="lf-phone"
                 type="tel"
                 placeholder="+61 400 000 000"
+                autoComplete="tel"
+                inputMode="tel"
+                enterKeyHint="done"
                 value={formData.phone}
                 onChange={(e) => setFormData((d) => ({ ...d, phone: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    e.currentTarget.form?.requestSubmit();
+                  }
+                }}
               />
             </div>
 
