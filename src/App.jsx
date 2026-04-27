@@ -244,9 +244,6 @@ export default function App() {
     const applyHeight = () => {
       const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
       document.documentElement.style.setProperty('--app-h', `${h}px`);
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-      }
     };
     applyHeight();
 
@@ -260,21 +257,19 @@ export default function App() {
     };
 
     const onFocusIn = (e) => {
-      const tag = e.target.tagName;
-      if (tag === 'TEXTAREA' || tag === 'INPUT') {
+      if (e.target === taRef.current) {
         scrollLock = true;
         document.documentElement.classList.add('kb-open');
-        [0, 50, 150, 300, 500, 800, 1200].forEach((d) => setTimeout(() => {
-          document.documentElement.scrollTop = 0;
-          document.body.scrollTop = 0;
-          applyHeight();
-        }, d));
+        if (scrollRef.current) {
+          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }
       }
     };
-    const onFocusOut = () => {
-      scrollLock = false;
-      document.documentElement.classList.remove('kb-open');
-      setTimeout(applyHeight, 100);
+    const onFocusOut = (e) => {
+      if (e.target === taRef.current) {
+        scrollLock = false;
+        document.documentElement.classList.remove('kb-open');
+      }
     };
 
     const vv = window.visualViewport;
@@ -603,15 +598,6 @@ export default function App() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
-                onFocus={() => {
-                  [0, 100, 250, 450, 700, 1000].forEach((d) => setTimeout(() => {
-                    window.scrollTo(0, 0);
-                    document.body.scrollTop = 0;
-                    if (scrollRef.current) {
-                      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-                    }
-                  }, d));
-                }}
                 placeholder="Ask about your marketing score…"
               />
               <button className="send" onClick={() => send()} disabled={!input.trim() || typing} aria-label="Send">

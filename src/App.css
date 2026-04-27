@@ -80,7 +80,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 32px 0 16px;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .chat-inner {
