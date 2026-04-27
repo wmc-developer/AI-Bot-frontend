@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './App.css';
-import wmcLogo from './assets/wmc-official-logo.png';
+import wmcLogo from './assets/wmc-official-logo 2.jpeg';
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 const CAMPAIGN_ID = import.meta.env.VITE_CAMPAIGN_ID;
@@ -20,14 +20,13 @@ function StarCanvas() {
     resize();
     window.addEventListener('resize', resize);
 
-    const STAR_COUNT = 180;
+    const STAR_COUNT = 120;
     const stars = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random() * window.innerWidth,
       y: Math.random() * window.innerHeight,
-      size: Math.random() * 1.6 + 0.2,
-      speed: Math.random() * 0.6 + 0.15,
-      opacity: Math.random() * 0.7 + 0.3,
-      
+      size: Math.random() * 2.5 + 1,
+      speed: Math.random() * 1.2 + 0.4,
+      opacity: Math.random() * 0.6 + 0.4,
     }));
 
     const SHOOT_INTERVAL = 2800;
@@ -50,11 +49,14 @@ function StarCanvas() {
 
       for (const s of stars) {
         s.y += s.speed;
-        if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
+        if (s.y > canvas.height) { s.y = -10; s.x = Math.random() * canvas.width; }
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(220, 235, 255, ${s.opacity})`;
+        ctx.fillStyle = `rgba(255, 140, 0, ${s.opacity})`;
+        ctx.shadowColor = 'rgba(255, 165, 0, 1)';
+        ctx.shadowBlur = 8;
         ctx.fill();
+        ctx.shadowBlur = 0;
       }
 
       if (ts - lastShoot > SHOOT_INTERVAL) { spawnShooter(); lastShoot = ts; }
@@ -191,7 +193,7 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '' });
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '', company: '' });
   const [formError, setFormError] = useState('');
   const [formLoading, setFormLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -308,19 +310,50 @@ export default function App() {
   const submitForm = async (e) => {
     e.preventDefault();
     setFormError('');
-    if (!formData.name.trim() || !formData.email.trim()) {
-      setFormError('Name and email are required.');
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.company.trim()) {
+      setFormError('First name, last name, email, and company are required.');
       return;
     }
+    const phoneDigits = formData.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 9) {
+      setFormError('Please enter a valid 9-digit Australian mobile number (after +61).');
+      return;
+    }
+    const fullPhone = `+61${phoneDigits}`;
+    const fullName = `${formData.firstName.trim()} ${formData.lastName.trim()}`;
     setFormLoading(true);
+
+    fetch('https://api.hsforms.com/submissions/v3/integration/submit/39712694/2a7fadd3-e4c4-4d3b-92a6-f26c18a9b457', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: [
+          { objectTypeId: '0-1', name: 'firstname', value: formData.firstName.trim() },
+          { objectTypeId: '0-1', name: 'lastname', value: formData.lastName.trim() },
+          { objectTypeId: '0-1', name: 'email', value: formData.email.trim() },
+          { objectTypeId: '0-1', name: 'mobilephone', value: fullPhone },
+          { objectTypeId: '0-1', name: 'company', value: formData.company.trim() },
+        ],
+        context: {
+          pageUri: window.location.href,
+          pageName: document.title,
+        },
+      }),
+    }).then(async (r) => {
+      if (!r.ok) {
+        const err = await r.json().catch(() => null);
+        console.warn('HubSpot submit error:', JSON.stringify(err, null, 2));
+      }
+    }).catch((e) => console.warn('HubSpot submit failed:', e));
+
     try {
       const res = await fetch(`${API_BASE}/api/chat/${CAMPAIGN_ID}/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.name.trim(),
+          name: fullName,
           email: formData.email.trim(),
-          phone: formData.phone.trim() || undefined,
+          phone: fullPhone,
         }),
       }).then((r) => r.json());
 
@@ -426,24 +459,45 @@ export default function App() {
               <p>Please enter your details to begin chat</p>
             </div>
 
-            <div className="field">
-              <label htmlFor="lf-name">Name <span>*</span></label>
-              <input
-                id="lf-name"
-                type="text"
-                placeholder="Your name"
-                autoComplete="name"
-                enterKeyHint="next"
-                value={formData.name}
-                onChange={(e) => setFormData((d) => ({ ...d, name: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    document.getElementById('lf-email')?.focus();
-                  }
-                }}
-                required
-              />
+            <div className="field-row">
+              <div className="field">
+                <label htmlFor="lf-firstname">First Name <span>*</span></label>
+                <input
+                  id="lf-firstname"
+                  type="text"
+                  placeholder="First name"
+                  autoComplete="given-name"
+                  enterKeyHint="next"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData((d) => ({ ...d, firstName: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      document.getElementById('lf-lastname')?.focus();
+                    }
+                  }}
+                  required
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="lf-lastname">Last Name <span>*</span></label>
+                <input
+                  id="lf-lastname"
+                  type="text"
+                  placeholder="Last name"
+                  autoComplete="family-name"
+                  enterKeyHint="next"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData((d) => ({ ...d, lastName: e.target.value }))}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      document.getElementById('lf-email')?.focus();
+                    }
+                  }}
+                  required
+                />
+              </div>
             </div>
             <div className="field">
               <label htmlFor="lf-email">Email <span>*</span></label>
@@ -459,6 +513,25 @@ export default function App() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
+                    document.getElementById('lf-company')?.focus();
+                  }
+                }}
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="lf-company">Company <span>*</span></label>
+              <input
+                id="lf-company"
+                type="text"
+                placeholder="Your company"
+                autoComplete="organization"
+                enterKeyHint="next"
+                value={formData.company}
+                onChange={(e) => setFormData((d) => ({ ...d, company: e.target.value }))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
                     document.getElementById('lf-phone')?.focus();
                   }
                 }}
@@ -466,23 +539,32 @@ export default function App() {
               />
             </div>
             <div className="field">
-              <label htmlFor="lf-phone">Phone <span className="optional">(optional)</span></label>
-              <input
-                id="lf-phone"
-                type="tel"
-                placeholder="+61 400 000 000"
-                autoComplete="tel"
-                inputMode="tel"
-                enterKeyHint="done"
-                value={formData.phone}
-                onChange={(e) => setFormData((d) => ({ ...d, phone: e.target.value }))}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    e.currentTarget.form?.requestSubmit();
-                  }
-                }}
-              />
+              <label htmlFor="lf-phone">Phone <span>*</span></label>
+              <div className="phone-input">
+                <span className="phone-prefix">+61</span>
+                <input
+                  id="lf-phone"
+                  type="tel"
+                  placeholder="400 000 000"
+                  autoComplete="tel-national"
+                  inputMode="tel"
+                  enterKeyHint="done"
+                  value={formData.phone}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    let formatted = digits;
+                    if (digits.length > 6) formatted = `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+                    else if (digits.length > 3) formatted = `${digits.slice(0, 3)} ${digits.slice(3)}`;
+                    setFormData((d) => ({ ...d, phone: formatted }));
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      e.currentTarget.form?.requestSubmit();
+                    }
+                  }}
+                />
+              </div>
             </div>
 
             {formError && <p className="form-error">{formError}</p>}
@@ -500,13 +582,13 @@ export default function App() {
             <div className="chat-inner">
               {messages.map((m, i) => (
                 <div key={i} className={`msg-row ${m.role}`}>
-                  <div className={`avatar ${m.role}`}>{m.role === 'bot' ? <img src={wmcLogo} alt="Wingman" style={{ width: '22px', height: '22px', objectFit: 'contain' }} /> : 'You'}</div>
+                  <div className={`avatar ${m.role}`}>{m.role === 'bot' ? <img src={wmcLogo} alt="Wingman" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : 'You'}</div>
                   <div className={`bubble ${m.role}`}><MessageText content={m.content} /></div>
                 </div>
               ))}
               {typing && (
                 <div className="msg-row bot">
-                  <div className="avatar bot"><img src={wmcLogo} alt="Wingman" style={{ width: '22px', height: '22px', objectFit: 'contain' }} /></div>
+                  <div className="avatar bot"><img src={wmcLogo} alt="Wingman" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div>
                   <div className="bubble bot"><div className="typing"><span /><span /><span /></div></div>
                 </div>
               )}
