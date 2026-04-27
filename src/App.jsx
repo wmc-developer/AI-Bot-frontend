@@ -256,19 +256,34 @@ export default function App() {
       }
     };
 
+    let rafId = null;
+    const lockLoop = () => {
+      if (!scrollLock) return;
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+      rafId = requestAnimationFrame(lockLoop);
+    };
+
     const onFocusIn = (e) => {
       if (e.target === taRef.current) {
         scrollLock = true;
         document.documentElement.classList.add('kb-open');
-        if (scrollRef.current) {
-          scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-        }
+        applyHeight();
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = requestAnimationFrame(lockLoop);
+        setTimeout(() => { scrollLock = false; if (rafId) cancelAnimationFrame(rafId); }, 1200);
       }
     };
     const onFocusOut = (e) => {
       if (e.target === taRef.current) {
         scrollLock = false;
+        if (rafId) cancelAnimationFrame(rafId);
         document.documentElement.classList.remove('kb-open');
+        setTimeout(applyHeight, 100);
       }
     };
 
